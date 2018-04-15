@@ -26,6 +26,10 @@ fn submit() -> Result<Json<JudgeSubmit>, SomeException> {
 
 
 /// Get judge state.
+/* TODO
+ * #[get("/judge_state/<sid>")]
+ * fn judge_state(sid: u32) -> Result<Json<JudgeState>, NotFound<()>>
+ */
 #[get("/judge_state")]
 fn judge_state() -> Result<Json<JudgeState>, NotFound<()>> {
     Ok(Json(JudgeState::build()
@@ -39,6 +43,10 @@ fn judge_state() -> Result<Json<JudgeState>, NotFound<()>> {
 
 
 /// Get final result.
+/* TODO
+ * #[get("/judge_state/<sid>")]
+ * fn judge_state(sid: u32) -> Result<Json<JudgeResult>, NotFound<()>>
+ */
 #[get("/result")]
 fn result() -> Result<Json<JudgeResult>, NotFound<()>> {
     Ok(Json(JudgeResult::Accept(ResultTrace::new(box [
