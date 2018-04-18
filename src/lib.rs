@@ -1,5 +1,6 @@
 #![feature(box_syntax, box_patterns)]
 #![feature(const_fn)]
+#![feature(custom_derive)]
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
@@ -10,5 +11,6 @@ extern crate rocket;
 extern crate serde;
 extern crate serde_json;
 
+pub mod req;
 pub mod resp;
 pub mod router;

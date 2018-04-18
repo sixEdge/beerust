@@ -3,20 +3,37 @@
 //! The state/stage of judge after submitting code,
 //! is possible to change every moment.
 
-use resp::Resp;
+use std::io::Cursor;
+
 use resp::judge_state::Stage::New;
+use resp::judge_result::JudgeErrorType;
+use rocket::response::Responder;
+use rocket::Request;
+use rocket::response;
+use rocket::Response;
+use rocket::http::ContentType;
+use serde_json;
 
 
 /// Judge state.
 /// Use it while judging.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JudgeState {
-    /// Stage of judge
+    /// stage of judge
     stage:              Stage,
+
+    /// message
     message:            String,
 }
 
 impl JudgeState {
+    pub fn build() -> Self {
+        JudgeState {
+            stage: New,
+            message: "".to_string(),
+        }
+    }
+
     pub fn stage(mut self, stage: Stage) -> Self {
         self.stage = stage;
         self
@@ -28,50 +45,64 @@ impl JudgeState {
     }
 }
 
-impl Resp for JudgeState {
-    fn build() -> Self {
-        JudgeState { stage: New, message: "".to_string() }
+impl<'r> Responder<'r> for JudgeState {
+    fn respond_to(self, _: &Request) -> response::Result<'r> {
+        Response::build()
+            .header(ContentType::new("application", "json"))
+            .sized_body(Cursor::new(serde_json::to_string(&self).unwrap()))
+            .ok()
     }
 }
 
 
 /// Judge stage
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum Stage {
     /// a new submission
     New,
 
-    /// program is queuing...
+    /// submission is queuing...
     Queuing {
         /// the number of submissions waiting ahead of yours
         waiting_ahead:      usize,
     },
 
-    /// program is compiling...
+    /// compiling code
     Compiling,
 
-    /// program is running...
+    /// program is running
     Running {
         /// the index of current test case
-        curr_case_idx:      usize,
+        case_idx:           usize,
         /// state
         state:              TestCaseState,
-        /// running time in `ms`
-        duration:           u32,
     },
 
     /// be stopped (e.g. queuing out of time) or complete
-    EXIT,
+    Exit {
+        case_idx:           usize,
+        state:              TestCaseState,
+    },
 }
 
 
 /// State of a case test
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum TestCaseState {
     Testing,
-    Pass,
-    Fail {
-        expect: String,
-        got:    String,
+    Pass {
+        /// `ms`
+        time_used:  u32,
+        /// `byte`
+        mem_used:   u32,
+    },
+    WrongAnswer {
+        expect:     String,
+        got:        String,
+    },
+    Error {
+        error: JudgeErrorType,
     },
 }

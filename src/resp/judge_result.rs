@@ -2,62 +2,71 @@
 //!
 //! The final result of judgement, several scenes are as below:
 //! + `Accept`: which means your code are correct
-//! + `Fail`: failed to pass all the test cases
-//! + `Error`: such as `Compile Error`, `Out Of Memory`...
+//! + `WrongAnswer`: failed to pass all the test cases
+//! + `Error`: such as `CompilationError`, `TimeLimitExceeded`...
 //! + `Panic`: when server arises some mistakes
 
+use std::io::Cursor;
+
 use resp::judge_state::TestCaseState;
+use rocket::response::Responder;
+use rocket::Request;
+use rocket::response;
+use rocket::Response;
+use rocket::http::ContentType;
+use serde_json;
 
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum JudgeResult {
-    Accept(ResultTrace),
-    Fail(ResultTrace),
-    Error(JudgeErrorType),
-    ServerPanic(String),
+    Accept(TestCaseTrace),
+    WrongAnswer(TestCaseTrace),
+    Error { message: String, error_type: JudgeErrorType },
+    ServerPanic { message: String },
+}
+
+impl<'r> Responder<'r> for JudgeResult {
+    fn respond_to(self, _: &Request) -> response::Result<'r> {
+        Response::build()
+            .header(ContentType::new("application", "json"))
+            .sized_body(Cursor::new(serde_json::to_string(&self).unwrap()))
+            .ok()
+    }
 }
 
 
-type _ResultTrace = [(usize, TestCaseState)];
+/// [(test case index * state)]
+type _TestCaseTrace = [(usize, TestCaseState)];
 
 
 /// Trace every test case that had been judged.
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ResultTrace {
-    /// [(test case id * TestCaseState)]
-    cases_result:           Box<_ResultTrace>,
-
-    /// judged-cases number
-    size:                   usize,
+pub struct TestCaseTrace {
+    cases_result:           Box<_TestCaseTrace>,
 }
 
-impl ResultTrace {
-    pub fn new(cases_result: Box<_ResultTrace>) -> Self {
-        let size = cases_result.len();
-        ResultTrace {
+impl TestCaseTrace {
+    pub fn new(cases_result: Box<_TestCaseTrace>) -> Self {
+        TestCaseTrace {
             cases_result,
-            size,
         }
     }
 }
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum JudgeErrorType {
-    /// (message)
-    CompileError(String),
+    CompilationError,
 
-    /// (message, memory usage)
-    OutOfMemory(String, u32),
+    MemoryLimitExceeded { mem_used: u32 },
 
+    TimeLimitExceeded   { time_used: u32 },
 
+    PresentationError,
 
+    RestrictedFunction,
 
-    // TODO ...
-
-
-
-
-    /// (message, error code)
-    RuntimeError(String, i32),
+    RuntimeError,
 }

@@ -7,34 +7,31 @@ use std::io::Cursor;
 use rocket::Request;
 use rocket::response::{self, Response, Responder};
 use rocket::http::ContentType;
-use resp::Resp;
 use serde_json;
 
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SomeException {
-    id:                 ExceptionId,
+    code:               ExceptionCode,
     message:            String,
 }
 
 impl SomeException {
-    pub fn id(mut self, id: usize) -> Self {
-        self.id = id;
+    pub fn build() -> Self {
+        SomeException {
+            code:       UNDEFINED_EXCEPTION,
+            message:    "".to_string(),
+        }
+    }
+
+    pub fn code(mut self, code: usize) -> Self {
+        self.code = code;
         self
     }
 
     pub fn message(mut self, message: String) -> Self {
         self.message = message;
         self
-    }
-}
-
-impl Resp for SomeException {
-    fn build() -> Self {
-        SomeException {
-            id:         UNDEFINED_EXCEPTION,
-            message:    "".to_string(),
-        }
     }
 }
 
@@ -48,5 +45,5 @@ impl<'r> Responder<'r> for SomeException {
 }
 
 
-type ExceptionId = usize;
-const UNDEFINED_EXCEPTION: ExceptionId = 0;
+type ExceptionCode = usize;
+const UNDEFINED_EXCEPTION: ExceptionCode = 0;
