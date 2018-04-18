@@ -13,7 +13,7 @@
 获取成功返回代码，失败返回 Not Found。
 ``` json
 {
-    "code": <用于简单测试的代码: string> 
+    "code": (用于简单测试的代码: string)
 }
 ```
 
@@ -35,8 +35,8 @@
 提交失败：[some_exception.rs](src/resp/some_exception.rs)
 ``` json
 {
-    "code": <错误码: i32>,
-    "message": <错误信息：string>
+    "code": (错误码: i32),
+    "message": (错误信息：string)
 }
 ```
 
