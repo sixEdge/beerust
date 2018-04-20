@@ -10,7 +10,7 @@ use rocket::http::ContentType;
 use serde_json;
 
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SomeException {
     code:               ExceptionCode,
     message:            String,
@@ -24,15 +24,7 @@ impl SomeException {
         }
     }
 
-    pub fn code(mut self, code: usize) -> Self {
-        self.code = code;
-        self
-    }
-
-    pub fn message(mut self, message: String) -> Self {
-        self.message = message;
-        self
-    }
+    setter!(code|ExceptionCode, message|String);
 }
 
 impl<'r> Responder<'r> for SomeException {
@@ -45,5 +37,5 @@ impl<'r> Responder<'r> for SomeException {
 }
 
 
-type ExceptionCode = usize;
+type ExceptionCode = i32;
 const UNDEFINED_EXCEPTION: ExceptionCode = 0;

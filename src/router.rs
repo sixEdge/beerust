@@ -2,45 +2,50 @@
 //!
 //! Access service according to RESTFul api.
 
-use rocket::response::status::NotFound;
-use resp::some_exception::SomeException;
 use resp::judge_submit::JudgeSubmit;
 use resp::judge_state::{JudgeState, TestCaseState::*, Stage::*};
 use resp::judge_result::{JudgeResult, TestCaseTrace, JudgeErrorType::*};
+use resp::test_code::TestCode;
+use resp::ResponseResult;
+use resp::ResponseResult::Success;
 
 
 /// Get code for simple test.
 /* TODO
- * #[get("/simple_test/<sid>")]
- * fn simple_test(cookies: Cookies) -> Result<JudgeState, NotFound<()>>
+ * #[get("/simple_test/<problem_id>")]
+ * fn test_code(cookies: Cookies, problem_id: u32) -> ResponseResult<TestCode>
  */
-#[get("/simple_test")]
-fn simple_test() -> Result<JudgeState, NotFound<()>> {
-    Err(NotFound(()))
+#[get("/test_code")]
+fn test_code() -> ResponseResult<TestCode> {
+//    Exception(SomeException::build()
+//        .code(0)
+//        .message("simple test SomeException test".to_string()))
+    Success(TestCode::build()
+        .simple_test("code for simple test".to_string())
+        .func_code("code for function that will be impl".to_string()))
 }
 
 
 /// Submit code.
 /* TODO
  * #[post("/submit", format = "application/json", data = "<solution>")]
- * fn submit(cookies: Cookies, solution: LenientForm<Solution>) -> Result<Submit, SomeException>
+ * fn submit(cookies: Cookies, solution: LenientForm<Solution>) -> ResponseResult<JudgeSubmit>
  */
 #[get("/submit")]
-fn submit() -> Result<JudgeSubmit, SomeException> {
-    Err(SomeException::build()
-        .code(2)
-        .message("submit SomeException test".to_string()))
+fn submit() -> ResponseResult<JudgeSubmit> {
+    Success(JudgeSubmit::build()
+        .id(1024))
 }
 
 
 /// Get judge state.
 /* TODO
- * #[get("/judge_state/<sid>")]
- * fn judge_state(cookies: Cookies, sid: u32) -> Result<JudgeState, NotFound<()>>
+ * #[get("/judge_state/<submission_id>")]
+ * fn judge_state(cookies: Cookies, submission_id: u32) -> ResponseResult<JudgeState>
  */
 #[get("/judge_state")]
-fn judge_state() -> Result<JudgeState, NotFound<()>> {
-    Ok(JudgeState::build()
+fn judge_state() -> ResponseResult<JudgeState> {
+    Success(JudgeState::build()
         .stage(Exit {
             case_idx:   6,
             state:      Error { error: TimeLimitExceeded { time_used: 120000000 } },
@@ -51,12 +56,12 @@ fn judge_state() -> Result<JudgeState, NotFound<()>> {
 
 /// Get final result.
 /* TODO
- * #[get("/result/<sid>")]
- * fn result(cookies: Cookies, sid: u32) -> Result<JudgeResult, NotFound<()>>
+ * #[get("/result/<submission_id>")]
+ * fn result(cookies: Cookies, submission_id: u32) -> ResponseResult<JudgeResult>
  */
 #[get("/result")]
-fn result() -> Result<JudgeResult, NotFound<()>> {
-    Ok(JudgeResult::WrongAnswer(TestCaseTrace::new(box [
+fn result() -> ResponseResult<JudgeResult> {
+    Success(JudgeResult::WrongAnswer(TestCaseTrace::new(box [
             (0, Pass { time_used: 100, mem_used: 10240 }),
             (1, Pass { time_used: 120, mem_used: 23333 }),
             (2, WrongAnswer { expect: "1 + 1 = 2".to_string(), got: "1 + 1 = 3".to_string() }),

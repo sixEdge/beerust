@@ -15,6 +15,8 @@ use serde_json;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JudgeSubmit {
     id:             usize,
+
+    // TODO add submit timestamp
 }
 
 impl JudgeSubmit {
@@ -24,10 +26,7 @@ impl JudgeSubmit {
         }
     }
 
-    pub fn id(mut self, id: usize) -> Self {
-        self.id = id;
-        self
-    }
+    setter!(id|usize);
 }
 
 impl<'r> Responder<'r> for JudgeSubmit {

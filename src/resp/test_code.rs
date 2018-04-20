@@ -11,25 +11,26 @@ use rocket::Response;
 use rocket::http::ContentType;
 use serde_json;
 
+
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SimpleTest {
-    code:           String,
+pub struct TestCode {
+    func_code:      String,
+    simple_test:    String,
 }
 
-impl SimpleTest {
+
+impl TestCode {
     pub fn build() -> Self {
-        SimpleTest {
-            code:   "".to_string(),
+        TestCode {
+            func_code:      "".to_string(),
+            simple_test:    "".to_string(),
         }
     }
 
-    pub fn code(mut self, code: String) -> Self {
-        self.code = code;
-        self
-    }
+    setter!(func_code|String, simple_test|String);
 }
 
-impl<'r> Responder<'r> for SimpleTest {
+impl<'r> Responder<'r> for TestCode {
     fn respond_to(self, _: &Request) -> response::Result<'r> {
         Response::build()
             .header(ContentType::new("application", "json"))

@@ -34,15 +34,7 @@ impl JudgeState {
         }
     }
 
-    pub fn stage(mut self, stage: Stage) -> Self {
-        self.stage = stage;
-        self
-    }
-
-    pub fn message(mut self, message: String) -> Self {
-        self.message = message;
-        self
-    }
+    setter!(stage|Stage, message|String);
 }
 
 impl<'r> Responder<'r> for JudgeState {
