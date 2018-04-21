@@ -24,7 +24,7 @@ impl SomeException {
         }
     }
 
-    setter!(code|ExceptionCode, message|String);
+    setter!(code: ExceptionCode, message: String);
 }
 
 impl<'r> Responder<'r> for SomeException {

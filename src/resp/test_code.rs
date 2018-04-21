@@ -27,7 +27,7 @@ impl TestCode {
         }
     }
 
-    setter!(func_code|String, simple_test|String);
+    setter!(func_code: String, simple_test: String);
 }
 
 impl<'r> Responder<'r> for TestCode {

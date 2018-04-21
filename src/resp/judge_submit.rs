@@ -26,7 +26,7 @@ impl JudgeSubmit {
         }
     }
 
-    setter!(id|usize);
+    setter!(id: usize);
 }
 
 impl<'r> Responder<'r> for JudgeSubmit {

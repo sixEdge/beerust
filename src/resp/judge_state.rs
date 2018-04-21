@@ -34,7 +34,7 @@ impl JudgeState {
         }
     }
 
-    setter!(stage|Stage, message|String);
+    setter!(stage: Stage, message: String);
 }
 
 impl<'r> Responder<'r> for JudgeState {
